@@ -48,5 +48,23 @@ services:
     stdin_open: true
     tty: true
 
+  # Symfony Admin Panel
+  admin-panel:
+    build:
+      context: ./admin-panel
+    ports:
+      - "8080:80"
+    environment:
+      - APP_ENV=dev
+      - APP_SECRET=your_symfony_secret_key_change_in_production
+      - API_BASE_URL=http://api:5000/api
+    depends_on:
+      - api
+      - database
+    volumes:
+      - ./admin-panel:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/var
+
 volumes:
   mysql_data:

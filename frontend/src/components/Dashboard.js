@@ -102,6 +102,9 @@ const Dashboard = () => {
           <h1>Task Management Dashboard</h1>
           <div className="user-info">
             <span>Welcome, {user.username}!</span>
+            <span className={`user-role role-${user.role}`}>
+              ({user.role === 'admin' ? 'Admin' : 'User'})
+            </span>
             <button onClick={logout} className="logout-btn">Logout</button>
           </div>
         </div>

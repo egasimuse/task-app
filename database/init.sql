@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(50) UNIQUE NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
+  role ENUM('admin', 'user') DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -26,9 +27,9 @@ CREATE TABLE IF NOT EXISTS tasks (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
-INSERT INTO users (username, email, password) VALUES 
-('admin', 'admin@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+INSERT INTO users (username, email, password, role) VALUES 
+('admin', 'admin@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
 
 INSERT INTO tasks (title, description, status, priority, assigned_to, created_by, due_date) VALUES 
 ('What is Lorem Ipsum?', "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s", 'completed', 'high', 1, 1, '2025-06-25'),
-('Why do we use it?', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.', 'high', 1, 1, '2025-06-26'),
+('Why do we use it?', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.', 'pending', 'high', 1, 1, '2025-06-26');

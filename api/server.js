@@ -107,7 +107,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     // Generate token
     const token = jwt.sign(
-      { id: user.id, username: user.username, email: user.email },
+      { id: user.id, username: user.username, email: user.email, role: user.role },
       process.env.JWT_SECRET || 'fallback_secret',
       { expiresIn: '24h' }
     );
@@ -115,7 +115,7 @@ app.post('/api/auth/login', async (req, res) => {
     res.json({
       message: 'Login successful',
       token,
-      user: { id: user.id, username: user.username, email: user.email }
+      user: { id: user.id, username: user.username, email: user.email, role: user.role }
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -146,9 +146,8 @@ app.get('/api/tasks', authenticateToken, async (req, res) => {
       FROM tasks t
       LEFT JOIN users creator ON t.created_by = creator.id
       LEFT JOIN users assignee ON t.assigned_to = assignee.id
-      WHERE t.assigned_to = ? OR t.created_by = ?
       ORDER BY t.created_at DESC
-    `, [req.user.id, req.user.id]);
+    `);
     
     res.json(tasks);
   } catch (error) {
@@ -228,14 +227,21 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
     const taskId = req.params.id;
     const { title, description, assigned_to, priority, due_date, status } = req.body;
     
-    // Check if task exists and user has permission
+    // Check if task exists
     const [existingTasks] = await db.execute(
-      'SELECT * FROM tasks WHERE id = ? AND (created_by = ? OR assigned_to = ?)',
-      [taskId, req.user.id, req.user.id]
+      'SELECT * FROM tasks WHERE id = ?',
+      [taskId]
     );
     
     if (existingTasks.length === 0) {
-      return res.status(404).json({ error: 'Task not found or no permission' });
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const task = existingTasks[0];
+
+    // Check permissions: admins can edit any task, users can only edit their own tasks
+    if (req.user.role !== 'admin' && task.created_by !== req.user.id) {
+      return res.status(403).json({ error: 'You can only edit tasks you created' });
     }
 
     // Build update query dynamically
@@ -305,14 +311,21 @@ app.patch('/api/tasks/:id/complete', authenticateToken, async (req, res) => {
   try {
     const taskId = req.params.id;
     
-    // Check if task exists and user has permission
+    // Check if task exists
     const [existingTasks] = await db.execute(
-      'SELECT * FROM tasks WHERE id = ? AND (created_by = ? OR assigned_to = ?)',
-      [taskId, req.user.id, req.user.id]
+      'SELECT * FROM tasks WHERE id = ?',
+      [taskId]
     );
     
     if (existingTasks.length === 0) {
-      return res.status(404).json({ error: 'Task not found or no permission' });
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const task = existingTasks[0];
+
+    // Check permissions: users can complete tasks they created or are assigned to, admins can complete any task
+    if (req.user.role !== 'admin' && task.created_by !== req.user.id && task.assigned_to !== req.user.id) {
+      return res.status(403).json({ error: 'You can only complete tasks you created or are assigned to' });
     }
 
     await db.execute(
@@ -346,14 +359,21 @@ app.delete('/api/tasks/:id', authenticateToken, async (req, res) => {
   try {
     const taskId = req.params.id;
     
-    // Check if task exists and user is the creator
+    // Check if task exists
     const [existingTasks] = await db.execute(
-      'SELECT * FROM tasks WHERE id = ? AND created_by = ?',
-      [taskId, req.user.id]
+      'SELECT * FROM tasks WHERE id = ?',
+      [taskId]
     );
     
     if (existingTasks.length === 0) {
-      return res.status(404).json({ error: 'Task not found or no permission to delete' });
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const task = existingTasks[0];
+
+    // Check permissions: admins can delete any task, users can only delete their own tasks
+    if (req.user.role !== 'admin' && task.created_by !== req.user.id) {
+      return res.status(403).json({ error: 'You can only delete tasks you created' });
     }
 
     await db.execute('DELETE FROM tasks WHERE id = ?', [taskId]);

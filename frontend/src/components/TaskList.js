@@ -16,11 +16,20 @@ const TaskList = ({ tasks, users, currentUser, onEdit, onComplete, onDelete }) =
   };
 
   const canEditTask = (task) => {
-    return task.created_by === currentUser.id || task.assigned_to === currentUser.id;
+    // Admins can edit any task, users can only edit tasks they created
+    return currentUser.role === 'admin' || task.created_by === currentUser.id;
   };
 
   const canDeleteTask = (task) => {
-    return task.created_by === currentUser.id;
+    // Admins can delete any task, users can only delete tasks they created
+    return currentUser.role === 'admin' || task.created_by === currentUser.id;
+  };
+
+  const canCompleteTask = (task) => {
+    // Users can complete tasks they created or are assigned to, admins can complete any task
+    return currentUser.role === 'admin' || 
+           task.created_by === currentUser.id || 
+           task.assigned_to === currentUser.id;
   };
 
   if (tasks.length === 0) {
@@ -71,7 +80,7 @@ const TaskList = ({ tasks, users, currentUser, onEdit, onComplete, onDelete }) =
           </div>
 
           <div className="task-actions">
-            {canEditTask(task) && task.status !== 'completed' && (
+            {canCompleteTask(task) && task.status !== 'completed' && (
               <button
                 className="complete-btn"
                 onClick={() => onComplete(task.id)}

@@ -43,6 +43,32 @@ const tasksController = {
     }
   },
 
+  // Get a single task by ID
+  async getById(req, res) {
+    try {
+      const taskId = req.params.id;
+      
+      const [tasks] = await db.execute(`
+        SELECT t.*, 
+               creator.username as creator_name,
+               assignee.username as assignee_name
+        FROM tasks t
+        LEFT JOIN users creator ON t.created_by = creator.id
+        LEFT JOIN users assignee ON t.assigned_to = assignee.id
+        WHERE t.id = ?
+      `, [taskId]);
+      
+      if (tasks.length === 0) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+      
+      res.json(tasks[0]);
+    } catch (error) {
+      console.error('Get task by ID error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
   // Create a new task
   async create(req, res) {
     try {

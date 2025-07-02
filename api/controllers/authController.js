@@ -84,6 +84,21 @@ const authController = {
       console.error('Login error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
+  },
+
+  // Validate token
+  async validateToken(req, res) {
+    try {
+      // The authenticateToken middleware has already verified the token
+      // and attached the user to req.user
+      res.json({
+        valid: true,
+        user: req.user
+      });
+    } catch (error) {
+      console.error('Token validation error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
 };
 

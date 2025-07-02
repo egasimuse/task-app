@@ -7,6 +7,7 @@ const router = express.Router();
 // Tasks routes
 router.get('/', authenticateToken, tasksController.getAll);
 router.get('/assigned', authenticateToken, tasksController.getAssigned);
+router.get('/:id', authenticateToken, tasksController.getById);
 router.post('/', authenticateToken, tasksController.create);
 router.put('/:id', authenticateToken, tasksController.update);
 router.patch('/:id/complete', authenticateToken, tasksController.complete);

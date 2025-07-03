@@ -5,7 +5,7 @@ const usersController = {
   async getAll(req, res) {
     try {
       const [users] = await db.execute(
-        'SELECT id, username, email, created_at FROM users'
+        'SELECT id, username, email, role, created_at, updated_at FROM users ORDER BY created_at DESC'
       );
       res.json(users);
     } catch (error) {

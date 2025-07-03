@@ -4,7 +4,7 @@ const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Users routes (all require authentication)
+// Users routes
 router.get('/', authenticateToken, usersController.getAll);
 
 module.exports = router;

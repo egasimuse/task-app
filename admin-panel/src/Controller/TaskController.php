@@ -62,8 +62,10 @@ class TaskController extends AbstractController
         $data = [
             'title' => $request->request->get('title'),
             'description' => $request->request->get('description'),
-            'status' => $request->request->get('status') ?: 'pending',
-            'assignee' => $request->request->get('assignee') ?: null
+            'status' => 'pending',
+            'assigned_to' => $request->request->get('assignee') ?: null,
+            'priority' => $request->request->get('priority') ?: 'medium',
+            'due_date' => $request->request->get('due_date') ? \DateTime::createFromFormat('Y-m-d', $request->request->get('due_date'))->format('m-d-Y') : null,
         ];
 
         // Validate required fields
@@ -159,11 +161,13 @@ class TaskController extends AbstractController
 
         // Set the auth token for API calls
         $this->apiClient->setAuthToken($token);
-
         $data = [
             'title' => $request->request->get('title'),
             'description' => $request->request->get('description'),
             'status' => $request->request->get('status') ?: 'pending',
+            'assigned_to' => $request->request->get('assignee') ?: null,
+            'priority' => $request->request->get('priority') ?: 'medium',
+            'due_date' => $request->request->get('due_date') ? \DateTime::createFromFormat('Y-m-d', $request->request->get('due_date'))->format('m-d-Y') : null,
         ];
 
         // Validate required fields
@@ -235,12 +239,6 @@ class TaskController extends AbstractController
             $this->addFlash('error', 'Failed to delete task: ' . $e->getMessage());
             return $this->redirectToRoute('admin_dashboard');
         }
-    }
-
-    private function getAdminUser(): ?array
-    {
-        $session = $this->container->get('request_stack')->getCurrentRequest()->getSession();
-        return $session->get('admin_user');
     }
 
     private function isXmlHttpRequest(): bool

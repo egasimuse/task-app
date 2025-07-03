@@ -54,6 +54,11 @@
         </div>
 
         <div class="info-row">
+            <strong>Due Date:</strong>
+            <span>{{ task.due_date ? task.due_date|date('F j, Y') : 'No due date set' }}</span>
+        </div>
+
+        <div class="info-row">
             <strong>Status:</strong>
             <span>
                 {% if task.status == 'completed' %}

@@ -23,12 +23,14 @@
                     <th>Title</th>
                     <th>Assigned To</th>
                     <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
                     <th>Created</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for task in tasks|slice(0, 10) %}
+                {% for task in tasks %}
                 <tr>
                     <td>{{ task.title }}</td>
                     <td>{{ task.assignee_name ?? 'Unassigned' }}</td>
@@ -41,6 +43,8 @@
                             <span class="badge badge-warning">{{ task.status|title }}</span>
                         {% endif %}
                     </td>
+                    <td>{{ task.priority|title }}</td>
+                    <td>{{ task.due_date ? task.due_date|date('Y-m-d') : 'N/A' }}</td>
                     <td>{{ task.created_at ? task.created_at|date('Y-m-d H:i') : 'N/A' }}</td>
                     <td>
                         <a href="{{ path('tasks_show', {id: task.id}) }}" class="btn btn-sm btn-info">View</a>
@@ -126,6 +130,32 @@
     color: #212529;
 }
 
+.btn {
+    display: inline-block;
+    font-weight: 500;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #0056b3;
+    outline: none;
+}
+
 .btn-sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
@@ -139,6 +169,20 @@
 .btn-warning {
     background-color: #ffc107;
     color: #212529;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    transition: background 0.2s;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+    background-color: #a71d2a;
+    color: #fff;
+    outline: none;
 }
 
 .btn-outline-secondary {

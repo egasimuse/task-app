@@ -33,15 +33,30 @@
             <textarea id="description" name="description" class="form-control" rows="4">{{ task.description ?? '' }}</textarea>
         </div>
 
-
+        {% if task.id ?? null %}
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="pending" {{ (task.status ?? 'pending') == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="in_progress" {{ (task.status ?? 'pending') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                    <option value="completed" {{ (task.status ?? 'pending') == 'completed' ? 'selected' : '' }}>Completed</option>
+                </select>
+            </div>
+        {% endif %}
 
         <div class="form-group">
-            <label for="status">Status</label>
-            <select id="status" name="status" class="form-control">
-                <option value="pending" {{ (task.status ?? 'pending') == 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="in_progress" {{ (task.status ?? 'pending') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                <option value="completed" {{ (task.status ?? 'pending') == 'completed' ? 'selected' : '' }}>Completed</option>
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority" class="form-control">
+                <option value="low" {{ (task.priority ?? 'medium') == 'low' ? 'selected' : '' }}>Low</option>
+                <option value="medium" {{ (task.priority ?? 'medium') == 'medium' ? 'selected' : '' }}>Medium</option>
+                <option value="high" {{ (task.priority ?? 'medium') == 'high' ? 'selected' : '' }}>High</option>
             </select>
+        </div>
+
+        <div class="form-group">
+            <label for="due_date">Due Date</label>
+            <input type="date" id="due_date" name="due_date" class="form-control"
+                   value="{{ (task.due_date ?? null) ? task.due_date|date('Y-m-d') : '' }}">
         </div>
 
         <div class="form-group">
@@ -49,7 +64,7 @@
             <select id="assignee" name="assignee" class="form-control">
                 <option value="">Unassigned</option>
                 {% for user in users %}
-                    <option value="{{ user.id }}" {{ (task.assignee_id ?? null) == user.id ? 'selected' : '' }}>
+                    <option value="{{ user.id }}" {{ (task.assigned_to ?? null) == user.id ? 'selected' : '' }}>
                         {{ user.username }}
                     </option>
                 {% endfor %}

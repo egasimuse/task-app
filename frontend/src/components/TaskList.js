@@ -86,7 +86,7 @@ const TaskList = ({ tasks, users, currentUser, onEdit, onComplete, onDelete }) =
                 onClick={() => onComplete(task.id)}
                 title="Mark as completed"
               >
-                ✓ Complete
+                Complete
               </button>
             )}
             
@@ -96,7 +96,7 @@ const TaskList = ({ tasks, users, currentUser, onEdit, onComplete, onDelete }) =
                 onClick={() => onEdit(task)}
                 title="Edit task"
               >
-                ✏️ Edit
+                Edit
               </button>
             )}
             
@@ -106,7 +106,7 @@ const TaskList = ({ tasks, users, currentUser, onEdit, onComplete, onDelete }) =
                 onClick={() => onDelete(task.id)}
                 title="Delete task"
               >
-                🗑️ Delete
+                Delete
               </button>
             )}
           </div>
